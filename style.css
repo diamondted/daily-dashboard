@@ -1,0 +1,231 @@
+:root {
+  --bg: #0e0f12;
+  --card: #16181d;
+  --card-hover: #1c1f25;
+  --text: #e8e8ea;
+  --muted: #8a8f99;
+  --accent: #d4a574;
+  --accent-soft: #d4a57422;
+  --green: #6dbf78;
+  --red: #d96e6e;
+  --border: #232730;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 32px 48px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--accent);
+}
+
+.date {
+  font-size: 14px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  transition: background 0.2s;
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.quote-card blockquote {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
+  font-style: italic;
+}
+
+.quote-card cite {
+  display: block;
+  margin-top: 12px;
+  font-style: normal;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.eli5 {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-size: 15px;
+  color: #d8d4cc;
+}
+
+.eli5::before {
+  content: "Like you're 5: ";
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.eppp-card .question {
+  font-size: 17px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.option {
+  padding: 12px 16px;
+  background: #11131780;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  gap: 12px;
+}
+
+.option:hover {
+  background: var(--card-hover);
+  border-color: #2e333d;
+}
+
+.option.correct {
+  border-color: var(--green);
+  background: #6dbf7822;
+}
+
+.option.incorrect {
+  border-color: var(--red);
+  background: #d96e6e22;
+}
+
+.option-letter {
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.reveal-btn {
+  background: var(--accent);
+  color: #14161a;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.reveal-btn:hover { filter: brightness(1.1); }
+.reveal-btn.hidden { display: none; }
+
+.answer {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.answer.hidden { display: none; }
+
+.correct, .explain, .why-wrong {
+  font-size: 15px;
+  padding: 12px 14px;
+  background: #11131780;
+  border-radius: 6px;
+}
+
+.correct { border-left: 3px solid var(--green); }
+.explain { border-left: 3px solid var(--accent); }
+.why-wrong { border-left: 3px solid var(--muted); }
+
+.why-wrong ul {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  color: #c8ccd4;
+}
+
+.why-wrong li { margin-bottom: 6px; }
+
+.study-card h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.study-meta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.study-meta a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.study-meta a:hover { text-decoration: underline; }
+
+footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+.dot { margin: 0 8px; }
+
+@media (max-width: 600px) {
+  header { padding: 20px 20px 16px; }
+  main { padding: 20px 16px 48px; }
+  .card { padding: 20px; }
+  .quote-card blockquote { font-size: 19px; }
+  .study-card h2 { font-size: 18px; }
+}

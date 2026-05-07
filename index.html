@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Brain — Quote, EPPP, Study</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">DAILY BRAIN</div>
+  <div class="date" id="date">—</div>
+</header>
+
+<main>
+  <section class="card quote-card" id="quote-card">
+    <div class="card-label">Quote of the day</div>
+    <blockquote id="quote-text">Loading…</blockquote>
+    <cite id="quote-author"></cite>
+    <div class="eli5" id="quote-eli5"></div>
+  </section>
+
+  <section class="card eppp-card" id="eppp-card">
+    <div class="card-label">EPPP Question of the Day</div>
+    <div class="question" id="eppp-question">Loading…</div>
+    <div class="options" id="eppp-options"></div>
+    <button class="reveal-btn" id="eppp-reveal">Show answer</button>
+    <div class="answer hidden" id="eppp-answer">
+      <div class="correct"><strong>Correct answer:</strong> <span id="eppp-correct"></span></div>
+      <div class="explain"><strong>Like you're 5:</strong> <span id="eppp-eli5"></span></div>
+      <div class="why-wrong"><strong>Why the others are wrong:</strong>
+        <ul id="eppp-why-wrong"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card study-card" id="study-card">
+    <div class="card-label">Trending Study</div>
+    <h2 id="study-title">Loading…</h2>
+    <div class="study-meta">
+      <span id="study-source"></span>
+      <a id="study-link" target="_blank" rel="noopener">Read the post →</a>
+    </div>
+    <div class="eli5" id="study-eli5"></div>
+  </section>
+</main>
+
+<footer>
+  <span id="updated">—</span>
+  <span class="dot">·</span>
+  <span>Refreshes every day at midnight ET</span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
