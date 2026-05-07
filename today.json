@@ -1,32 +1,49 @@
 {
   "date": "2026-05-07",
-  "generatedAt": "2026-05-07T15:23:06.331Z",
+  "generatedAt": "2026-05-07T15:55:00.204Z",
   "quote": {
-    "text": "The greatest weapon against stress is our ability to choose one thought over another.",
-    "author": "William James",
-    "eli5": "When life feels heavy, picking which thought to focus on can help you feel calmer."
+    "text": "The mind is not a vessel to be filled, but a fire to be kindled.",
+    "author": "Plutarch"
   },
   "eppp": {
-    "question": "A 7-year-old child shows difficulty with reading despite normal intelligence, adequate instruction, and no sensory impairments. The child's word reading is slow, inaccurate, and effortful. Which DSM-5 diagnosis is most appropriate?",
+    "question": "A 7-year-old child is referred for evaluation due to persistent inattention and hyperactivity at school and home. The psychologist wants to use a measure that gathers information from multiple raters across settings to assess these behaviors. Which instrument is MOST appropriate?",
     "options": [
-      "Intellectual Disability",
-      "Specific Learning Disorder, with impairment in reading",
-      "Attention-Deficit/Hyperactivity Disorder",
-      "Language Disorder"
+      "Wechsler Intelligence Scale for Children, Fifth Edition (WISC-V)",
+      "Behavior Assessment System for Children, Third Edition (BASC-3)",
+      "Children's Apperception Test (CAT)",
+      "Bender Visual-Motor Gestalt Test, Second Edition"
     ],
     "correctIndex": 1,
-    "eli5": "When a smart kid has a really hard time reading words even though they can see, hear, and have been taught well, that's called a Specific Learning Disorder in reading. It's like their brain has trouble with one specific puzzle — reading — even though everything else works fine.",
+    "eli5": "The BASC-3 is like asking lots of grown-ups who know the kid — parents AND teachers — to fill out the same kind of checklist. That way you see if the child acts the same way at home and at school. It's built to spot things like trouble paying attention or being too wiggly.",
     "whyOthersWrong": [
-      "Intellectual Disability means thinking skills are below average overall, but this child has normal intelligence.",
+      "The WISC-V measures how smart a kid is at thinking and solving puzzles, not how they behave across home and school.",
       "(correct)",
-      "ADHD is about trouble paying attention or sitting still, not about how words look on a page.",
-      "Language Disorder is about understanding or using spoken language, not specifically reading words."
+      "The CAT shows kids pictures and asks them to tell stories — it's about feelings and inner worries, not a checklist for many adults to fill out.",
+      "The Bender checks how well a kid can copy shapes with a pencil — it looks at hand-eye skills, not behavior across settings."
     ]
   },
   "study": {
     "title": "For years, researchers have claimed that men’s friendships are shallower and less emotionally supportive than women’s, a pattern called the “gender friendship gap.” But new research finds that the gap is largely driven by white men specifically, not men as a whole.",
-    "source": "r/psychology · 1515 upvotes",
-    "url": "https://www.psypost.org/the-gender-friendship-gap-is-driven-primarily-by-white-men-not-a-universal-difference-across-groups/",
-    "eli5": "Researchers used to say men have less close, feelings-sharing friendships than women. But this new study found that pattern mostly fits white men — men from other racial and cultural groups often have warm, emotionally close friendships too. It matters because lumping all men together hides the real story and can make us miss how culture shapes the way people connect. Better understanding here could help us support healthier friendships for everyone."
+    "authors": "",
+    "journal": "r/psychology",
+    "studyUrl": "https://www.psypost.org/the-gender-friendship-gap-is-driven-primarily-by-white-men-not-a-universal-difference-across-groups/",
+    "redditUrl": "https://reddit.com/r/psychology/comments/1t1o08s/for_years_researchers_have_claimed_that_mens/",
+    "eli5": "Some people online shared a claim that men's friendships look less close and supportive than women's. The post says new research suggests this 'gap' mostly shows up for white men, not men in general. In other words, men from other racial groups may have closer friendships than the old story suggested. We could not find the actual study to check the details.",
+    "psydAnalysis": "Heads up: this came from a Reddit discussion thread and we could not verify it on PubMed, so treat it as an unverified claim, not established science. If the claim holds, it would matter for clinical work because therapists often assume male clients have weaker social support and may push them toward building friendships using a one-size-fits-all model. The claim suggests culture and race shape how men connect, so a clinician should ask each client how their community defines closeness instead of guessing. It also reminds us that older research on gender often used mostly white college samples, which can make findings look universal when they are not. For a future PsyD, the takeaway is to stay curious about who was actually studied before applying a 'known' pattern to a client in front of you.",
+    "strengths": [
+      "The topic addresses a clinically meaningful question about social support and male clients.",
+      "Breaking results down by race pushes back against treating 'men' as one uniform group.",
+      "If accurate, the framing aligns with growing calls for intersectional research in psychology.",
+      "The discussion invites clinicians to question long-standing assumptions in the literature."
+    ],
+    "weaknesses": [
+      "The original study could not be located on PubMed, so methods, sample size, and measures are unknown.",
+      "We cannot tell how 'friendship depth' or 'emotional support' was defined or measured.",
+      "Reddit summaries often overstate or simplify findings from a single study.",
+      "Without the source, we do not know if results have been replicated or peer-reviewed.",
+      "The claim risks creating a new stereotype if readers generalize from one unverified post."
+    ],
+    "validated": false,
+    "validationNote": "Could not be independently verified on PubMed"
   }
 }

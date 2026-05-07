@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Daily Brain — content generator.
- * Produces today.json with: quote, EPPP MCQ, trending study (all ELI5).
+ * Produces today.json with: quote, EPPP MCQ, validated PubMed study (PsyD-level breakdown).
  *
  * Run: node daily-dashboard/generate-daily.js
  *   --force     ignore that today.json already exists
@@ -28,8 +28,9 @@ if (!FORCE && fs.existsSync(OUT)) {
 }
 
 const SUBREDDITS = ["neuro", "neuroscience", "cogsci", "cogneuro", "psychology"];
+const STUDY_RX = /study|research|paper|finding|published|journal|trial|preprint|biorxiv|nature|science|neuron|cell|nih|pubmed|meta-analysis/i;
 
-async function fetchTrendingStudy() {
+async function fetchTrendingCandidates() {
   const candidates = [];
   for (const sub of SUBREDDITS) {
     try {
@@ -41,42 +42,116 @@ async function fetchTrendingStudy() {
       for (const post of j.data.children) {
         const p = post.data;
         if (p.stickied || p.over_18) continue;
-        const looksLikeStudy =
-          /study|research|paper|finding|published|journal|trial|preprint|biorxiv|nature|science|neuron|cell|nih|pubmed/i.test(
-            p.title + " " + (p.selftext || "")
-          );
-        if (!looksLikeStudy) continue;
+        if (!STUDY_RX.test(p.title + " " + (p.selftext || ""))) continue;
         candidates.push({
           title: p.title,
           subreddit: "r/" + p.subreddit,
-          url: "https://reddit.com" + p.permalink,
+          permalink: "https://reddit.com" + p.permalink,
+          externalUrl: p.url_overridden_by_dest || null,
+          selftext: (p.selftext || "").slice(0, 1500),
           score: p.score,
           comments: p.num_comments,
-          selftext: (p.selftext || "").slice(0, 1500),
-          externalUrl: p.url_overridden_by_dest || null,
+          rank: p.score + 2 * p.num_comments,
         });
       }
     } catch (e) {
       console.warn("reddit fetch failed for", sub, e.message);
     }
   }
-  candidates.sort((a, b) => b.score + b.comments * 2 - (a.score + a.comments * 2));
-  if (candidates.length === 0) {
+  candidates.sort((a, b) => b.rank - a.rank);
+  return candidates;
+}
+
+function extractKeyTerms(redditTitle) {
+  // Strip clickbait prefixes and common filler words; keep likely study-content words.
+  let t = redditTitle
+    .replace(/^(new|study|research|scientists|researchers|finds?|shows?|reveals?|suggests?|claims?)[: ]+/i, "")
+    .replace(/[“”"',.!?():;]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const stop = new Set("a an the of to and or but for in on at by with from is was are were be been being have has had this that these those it its as than then so we they you i your our".split(" "));
+  const words = t.split(" ").filter(w => w.length > 2 && !stop.has(w.toLowerCase()));
+  return words.slice(0, 8).join(" ");
+}
+
+async function pubmedSearch(query) {
+  const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=3&term=${encodeURIComponent(query)}`;
+  const r = await fetch(url);
+  if (!r.ok) return [];
+  const j = await r.json();
+  return j.esearchresult?.idlist || [];
+}
+
+async function pubmedSummary(pmid) {
+  const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${pmid}&retmode=json`;
+  const r = await fetch(url);
+  if (!r.ok) return null;
+  const j = await r.json();
+  const s = j.result?.[pmid];
+  if (!s) return null;
+  const authors = (s.authors || []).slice(0, 4).map(a => a.name).join(", ") + (s.authors?.length > 4 ? ", et al." : "");
+  const year = (s.pubdate || "").slice(0, 4);
+  const doi = (s.articleids || []).find(x => x.idtype === "doi")?.value || null;
+  return {
+    pmid,
+    title: s.title || "",
+    authors: authors + (year ? ` (${year})` : ""),
+    journal: s.fulljournalname || s.source || "",
+    doi,
+    studyUrl: doi ? `https://doi.org/${doi}` : `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`,
+  };
+}
+
+async function pubmedAbstract(pmid) {
+  const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${pmid}&rettype=abstract&retmode=text`;
+  const r = await fetch(url);
+  if (!r.ok) return "";
+  return await r.text();
+}
+
+async function findValidatedStudy(candidates) {
+  // Walk down the candidate list, try to validate each on PubMed.
+  for (const c of candidates.slice(0, 8)) {
+    const query = extractKeyTerms(c.title);
+    if (!query) continue;
+    try {
+      const ids = await pubmedSearch(query);
+      for (const pmid of ids) {
+        const summary = await pubmedSummary(pmid);
+        if (!summary || !summary.title) continue;
+        // Sanity-check title overlap (avoid wrong-paper matches).
+        const titleWords = new Set(summary.title.toLowerCase().split(/\W+/).filter(w => w.length > 3));
+        const queryWords = query.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+        const overlap = queryWords.filter(w => titleWords.has(w)).length;
+        if (overlap < 2) continue;
+        const abstract = await pubmedAbstract(pmid);
+        return {
+          ...summary,
+          abstract,
+          redditPost: c,
+          validated: true,
+          validationNote: `Verified via PubMed (PMID ${pmid})`,
+        };
+      }
+    } catch (e) {
+      console.warn("pubmed lookup failed for", c.title.slice(0, 60), e.message);
+    }
+  }
+  // Fallback: return first candidate without validation.
+  if (candidates[0]) {
     return {
-      title: "(No trending study found today)",
-      source: "—",
-      url: "https://www.reddit.com/r/neuroscience/",
-      selftext: "",
+      title: candidates[0].title,
+      authors: "",
+      journal: candidates[0].subreddit,
+      studyUrl: candidates[0].externalUrl || candidates[0].permalink,
+      doi: null,
+      abstract: candidates[0].selftext,
+      redditPost: candidates[0],
+      validated: false,
+      validationNote: "Could not be independently verified on PubMed",
     };
   }
-  const top = candidates[0];
-  return {
-    title: top.title,
-    source: top.subreddit + ` · ${top.score} upvotes`,
-    url: top.url,
-    selftext: top.selftext,
-    externalUrl: top.externalUrl,
-  };
+  return null;
 }
 
 const client = new Anthropic();
@@ -88,12 +163,8 @@ const SCHEMA = {
     quote: {
       type: "object",
       additionalProperties: false,
-      properties: {
-        text: { type: "string" },
-        author: { type: "string" },
-        eli5: { type: "string" },
-      },
-      required: ["text", "author", "eli5"],
+      properties: { text: { type: "string" }, author: { type: "string" } },
+      required: ["text", "author"],
     },
     eppp: {
       type: "object",
@@ -107,26 +178,54 @@ const SCHEMA = {
       },
       required: ["question", "options", "correctIndex", "eli5", "whyOthersWrong"],
     },
-    studyEli5: { type: "string" },
+    studyAnalysis: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        eli5: { type: "string" },
+        psydAnalysis: { type: "string" },
+        strengths: { type: "array", items: { type: "string" } },
+        weaknesses: { type: "array", items: { type: "string" } },
+      },
+      required: ["eli5", "psydAnalysis", "strengths", "weaknesses"],
+    },
   },
-  required: ["quote", "eppp", "studyEli5"],
+  required: ["quote", "eppp", "studyAnalysis"],
 };
 
 async function generateContent(study) {
-  const prompt = `Today is ${today}. Generate fresh daily content for a psychology/neuropsychology dashboard. Return ALL THREE pieces.
-
-1) QUOTE: One inspiring or thought-provoking quote relevant to psychology, neuroscience, the mind, or human behavior. Real quote from a real person (psychologist, neuroscientist, philosopher, scientist, writer). Vary it day to day — do NOT default to William James, Carl Jung, or Viktor Frankl every time. Include a one-sentence ELI5 explanation of what it means for someone with no background.
-
-2) EPPP QUESTION: One multiple-choice question for the Examination for Professional Practice in Psychology (EPPP). Cover any major content area: assessment, ethics, treatment, psychopathology, biological bases, social/cultural, lifespan, research methods, professional issues. Provide 4 options. Indicate correctIndex (0–3). Provide an ELI5 explanation of WHY the correct answer is correct, written like you're explaining to a 5-year-old (simple words, concrete examples). Provide a "whyOthersWrong" array of 4 strings (one per option, including the correct one — for the correct one just write "(correct)"). Each wrong-answer explanation should also be ELI5-friendly.
-
-3) STUDY ELI5: Here is the trending study/post. Write a 3-4 sentence ELI5 summary of what it's about and why it matters. Avoid jargon. If you're not sure what the study is actually about (e.g. it's just a discussion thread), say so honestly and summarize the conversation instead.
-
-STUDY:
+  const studyContext = study.validated
+    ? `VERIFIED study from PubMed:
 Title: ${study.title}
-Source: ${study.source}
-${study.externalUrl ? "External link: " + study.externalUrl + "\n" : ""}Discussion text: ${study.selftext || "(no body text)"}
+Authors: ${study.authors}
+Journal: ${study.journal}
+DOI: ${study.doi || "—"}
+Abstract:
+${(study.abstract || "").slice(0, 4000)}`
+    : `UNVERIFIED reddit-sourced post (PubMed match not found):
+Title: ${study.title}
+Source: ${study.journal}
+Body text (may be a discussion thread, not a study):
+${(study.abstract || "").slice(0, 2000)}`;
 
-Return JSON matching the schema. Be accurate, ethical, and avoid clinical advice. ELI5 means: short sentences, no jargon, concrete imagery a child could picture.`;
+  const prompt = `Today is ${today}. Generate fresh daily content for a psychology/neuropsychology dashboard targeted at PsyD students. Return ALL THREE pieces.
+
+1) QUOTE: One real quote from a real psychologist, neuroscientist, philosopher, or scientist. VARY DAILY — do NOT default to William James, Carl Jung, or Viktor Frankl. Just text + author. NO explanation needed.
+
+2) EPPP MULTIPLE-CHOICE: One question for the Examination for Professional Practice in Psychology. Cover any major content area (assessment, ethics, treatment, psychopathology, biological bases, lifespan, social/cultural, research methods, professional issues). 4 options. correctIndex 0-3. eli5 explanation of WHY the correct answer is correct (simple words, concrete imagery a 5yo could picture). whyOthersWrong: array of 4 strings — the entry at correctIndex must be exactly "(correct)", the other three give ELI5-style explanations of why each is wrong.
+
+3) STUDY ANALYSIS for a PsyD student. Use simple, ELI5-level language throughout — short sentences, concrete imagery, no jargon dump — but with depth a clinical doctoral student needs. Provide:
+   - eli5: 3-4 plain sentences. What did they do, what did they find. No clinical advice.
+   - psydAnalysis: 4-6 sentences. Why does this matter for clinical psych practice? What's the methodology in plain terms? What population/setting? What can a future clinician do with this?
+   - strengths: 3-5 short bullets (each one sentence). Things like sample size, design quality, replication, ecological validity.
+   - weaknesses: 3-5 short bullets (each one sentence). Limitations: small N, selection bias, generalizability, confounds, replication concerns, etc.
+   ${study.validated
+     ? "Ground all analysis in the abstract provided. Do not invent details not in the abstract."
+     : "The source could NOT be verified on PubMed. Be honest about this — note in psydAnalysis that this is a discussion-level post or unverified claim, and base strengths/weaknesses on what's discernible from the post text only. Do NOT invent study methods or findings."}
+
+${studyContext}
+
+Ethics: no diagnostic claims, no medication advice, no clinical promises. Return JSON matching the schema exactly.`;
 
   const response = await client.messages.create({
     model: "claude-opus-4-7",
@@ -145,11 +244,20 @@ Return JSON matching the schema. Be accurate, ethical, and avoid clinical advice
 async function main() {
   console.log("[daily-brain]", today, "— generating content");
 
-  console.log("→ fetching trending study from Reddit");
-  const study = await fetchTrendingStudy();
-  console.log("  picked:", study.title.slice(0, 80));
+  console.log("→ fetching trending psych studies from Reddit");
+  const candidates = await fetchTrendingCandidates();
+  if (candidates.length === 0) {
+    throw new Error("No trending study candidates found");
+  }
+  console.log("  ", candidates.length, "candidates");
 
-  console.log("→ asking Claude for quote + EPPP + study ELI5");
+  console.log("→ validating top candidates against PubMed");
+  const study = await findValidatedStudy(candidates);
+  if (!study) throw new Error("No usable study found");
+  console.log("  picked:", study.title.slice(0, 80));
+  console.log("  validated:", study.validated, "—", study.validationNote);
+
+  console.log("→ asking Claude for quote + EPPP + study analysis");
   const generated = await generateContent(study);
 
   const payload = {
@@ -159,9 +267,16 @@ async function main() {
     eppp: generated.eppp,
     study: {
       title: study.title,
-      source: study.source,
-      url: study.externalUrl || study.url,
-      eli5: generated.studyEli5,
+      authors: study.authors || "",
+      journal: study.journal || "",
+      studyUrl: study.studyUrl,
+      redditUrl: study.redditPost?.permalink || null,
+      eli5: generated.studyAnalysis.eli5,
+      psydAnalysis: generated.studyAnalysis.psydAnalysis,
+      strengths: generated.studyAnalysis.strengths,
+      weaknesses: generated.studyAnalysis.weaknesses,
+      validated: study.validated,
+      validationNote: study.validationNote,
     },
   };
 

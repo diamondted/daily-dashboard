@@ -20,7 +20,6 @@ function render(d) {
 
   document.getElementById('quote-text').textContent = '“' + d.quote.text + '”';
   document.getElementById('quote-author').textContent = '— ' + d.quote.author;
-  document.getElementById('quote-eli5').textContent = d.quote.eli5;
 
   document.getElementById('eppp-question').textContent = d.eppp.question;
   const optsEl = document.getElementById('eppp-options');
@@ -51,11 +50,53 @@ function render(d) {
     showAnswer(d.eppp.correctIndex);
   });
 
-  document.getElementById('study-title').textContent = d.study.title;
-  document.getElementById('study-source').textContent = d.study.source;
+  const s = d.study;
+  document.getElementById('study-title').textContent = s.title;
+
+  const badge = document.getElementById('study-validation');
+  if (s.validated) {
+    badge.textContent = 'PUBMED VERIFIED';
+    badge.className = 'validation-badge verified';
+  } else {
+    badge.textContent = 'UNVERIFIED';
+    badge.className = 'validation-badge unverified';
+  }
+
+  document.getElementById('study-authors').textContent = s.authors || '';
+  const journalSep = document.getElementById('study-journal-sep');
+  document.getElementById('study-journal').textContent = s.journal || '';
+  journalSep.style.display = (s.authors && s.journal) ? '' : 'none';
+
   const link = document.getElementById('study-link');
-  link.href = d.study.url;
-  document.getElementById('study-eli5').textContent = d.study.eli5;
+  link.href = s.studyUrl;
+  const reddit = document.getElementById('study-reddit');
+  if (s.redditUrl) {
+    reddit.href = s.redditUrl;
+    reddit.style.display = '';
+  } else {
+    reddit.style.display = 'none';
+  }
+
+  document.getElementById('study-eli5').textContent = s.eli5;
+  document.getElementById('study-psyd').textContent = s.psydAnalysis;
+
+  const strEl = document.getElementById('study-strengths');
+  strEl.innerHTML = '';
+  (s.strengths || []).forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    strEl.appendChild(li);
+  });
+
+  const weakEl = document.getElementById('study-weaknesses');
+  weakEl.innerHTML = '';
+  (s.weaknesses || []).forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    weakEl.appendChild(li);
+  });
+
+  document.getElementById('study-validation-note').textContent = s.validationNote || '';
 }
 
 function pick(chosen, correct) {

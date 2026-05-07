@@ -190,27 +190,132 @@ main {
 .why-wrong li { margin-bottom: 6px; }
 
 .study-card h2 {
-  margin: 0 0 10px 0;
+  margin: 0 0 8px 0;
   font-size: 20px;
   line-height: 1.3;
   color: var(--text);
 }
 
-.study-meta {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+.study-citation {
   font-size: 13px;
   color: var(--muted);
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.study-citation .dot { margin: 0 6px; }
+
+.study-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.study-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.study-links a:hover { text-decoration: underline; }
+.study-links a.muted-link { color: var(--muted); font-weight: 400; }
+
+.validation-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  vertical-align: middle;
+}
+
+.validation-badge.verified {
+  background: #6dbf7822;
+  color: var(--green);
+  border: 1px solid #6dbf7855;
+}
+
+.validation-badge.unverified {
+  background: #d9a76e22;
+  color: #d9a76e;
+  border: 1px solid #d9a76e55;
+}
+
+.psyd-section {
+  margin-top: 18px;
+  padding: 16px;
+  background: #11131780;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.psyd-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
   margin-bottom: 8px;
 }
 
-.study-meta a {
-  color: var(--accent);
-  text-decoration: none;
+.psyd-text {
+  font-size: 15px;
+  color: #d8d4cc;
+  line-height: 1.6;
 }
 
-.study-meta a:hover { text-decoration: underline; }
+.sw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.sw-block {
+  padding: 14px 16px;
+  background: #11131780;
+  border-radius: 8px;
+}
+
+.sw-block.strengths { border-left: 3px solid var(--green); }
+.sw-block.weaknesses { border-left: 3px solid var(--red); }
+
+.sw-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.sw-block.strengths .sw-label { color: var(--green); }
+.sw-block.weaknesses .sw-label { color: var(--red); }
+
+.sw-block ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 14px;
+  color: #c8ccd4;
+  line-height: 1.5;
+}
+
+.sw-block li { margin-bottom: 6px; }
+
+.validation-note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .sw-grid { grid-template-columns: 1fr; }
+  .study-links { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
 
 footer {
   text-align: center;

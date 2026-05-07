@@ -17,7 +17,6 @@
     <div class="card-label">Quote of the day</div>
     <blockquote id="quote-text">Loading…</blockquote>
     <cite id="quote-author"></cite>
-    <div class="eli5" id="quote-eli5"></div>
   </section>
 
   <section class="card eppp-card" id="eppp-card">
@@ -35,13 +34,33 @@
   </section>
 
   <section class="card study-card" id="study-card">
-    <div class="card-label">Trending Study</div>
+    <div class="card-label">Trending Study <span class="validation-badge" id="study-validation"></span></div>
     <h2 id="study-title">Loading…</h2>
-    <div class="study-meta">
-      <span id="study-source"></span>
-      <a id="study-link" target="_blank" rel="noopener">Read the post →</a>
+    <div class="study-citation">
+      <span id="study-authors"></span>
+      <span class="dot" id="study-journal-sep">·</span>
+      <span id="study-journal"></span>
+    </div>
+    <div class="study-links">
+      <a id="study-link" target="_blank" rel="noopener">Read the study →</a>
+      <a id="study-reddit" target="_blank" rel="noopener" class="muted-link">Reddit discussion</a>
     </div>
     <div class="eli5" id="study-eli5"></div>
+    <div class="psyd-section">
+      <div class="psyd-label">For the PsyD student</div>
+      <div class="psyd-text" id="study-psyd"></div>
+    </div>
+    <div class="sw-grid">
+      <div class="sw-block strengths">
+        <div class="sw-label">Strengths</div>
+        <ul id="study-strengths"></ul>
+      </div>
+      <div class="sw-block weaknesses">
+        <div class="sw-label">Weaknesses</div>
+        <ul id="study-weaknesses"></ul>
+      </div>
+    </div>
+    <div class="validation-note" id="study-validation-note"></div>
   </section>
 </main>
 
