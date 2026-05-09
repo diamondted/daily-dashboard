@@ -27,39 +27,92 @@ if (!FORCE && fs.existsSync(OUT)) {
   }
 }
 
-const SUBREDDITS = ["neuro", "neuroscience", "cogsci", "cogneuro", "psychology"];
-const STUDY_RX = /study|research|paper|finding|published|journal|trial|preprint|biorxiv|nature|science|neuron|cell|nih|pubmed|meta-analysis/i;
+const FEEDS = [
+  { name: "PsyPost", url: "https://www.psypost.org/feed/" },
+  { name: "Neuroscience News", url: "https://neurosciencenews.com/feed/" },
+  { name: "ScienceDaily Mind & Brain", url: "https://www.sciencedaily.com/rss/mind_brain.xml" },
+];
+const MAX_AGE_DAYS = 14;
+
+function decodeEntities(s) {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;|&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
+}
+
+function stripCdata(s) {
+  return s.replace(/^<!\[CDATA\[/, "").replace(/\]\]>$/, "");
+}
+
+function stripTags(s) {
+  return s.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
+function pickTag(item, tag) {
+  const m = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+  if (!m) return "";
+  return decodeEntities(stripCdata(m[1].trim()));
+}
+
+async function fetchFeed(feed) {
+  const items = [];
+  try {
+    const r = await fetch(feed.url, { headers: { "User-Agent": "daily-brain/1.0" } });
+    if (!r.ok) {
+      console.warn("rss fetch", feed.name, "HTTP", r.status);
+      return items;
+    }
+    const xml = await r.text();
+    const itemMatches = xml.match(/<item[\s\S]*?<\/item>/g) || [];
+    for (const raw of itemMatches) {
+      const title = pickTag(raw, "title");
+      const link = pickTag(raw, "link");
+      const description = stripTags(pickTag(raw, "description"));
+      const pubDate = pickTag(raw, "pubDate");
+      if (!title || !link) continue;
+      const date = pubDate ? new Date(pubDate) : null;
+      const ageDays = date ? (Date.now() - date.getTime()) / 86400000 : 999;
+      items.push({
+        title,
+        link,
+        description: description.slice(0, 1500),
+        pubDate: date ? date.toISOString() : null,
+        ageDays,
+        source: feed.name,
+      });
+    }
+  } catch (e) {
+    console.warn("rss fetch failed for", feed.name, e.message);
+  }
+  return items;
+}
 
 async function fetchTrendingCandidates() {
-  const candidates = [];
-  for (const sub of SUBREDDITS) {
-    try {
-      const r = await fetch(`https://www.reddit.com/r/${sub}/top.json?t=week&limit=25`, {
-        headers: { "User-Agent": "daily-brain/1.0" },
-      });
-      if (!r.ok) continue;
-      const j = await r.json();
-      for (const post of j.data.children) {
-        const p = post.data;
-        if (p.stickied || p.over_18) continue;
-        if (!STUDY_RX.test(p.title + " " + (p.selftext || ""))) continue;
-        candidates.push({
-          title: p.title,
-          subreddit: "r/" + p.subreddit,
-          permalink: "https://reddit.com" + p.permalink,
-          externalUrl: p.url_overridden_by_dest || null,
-          selftext: (p.selftext || "").slice(0, 1500),
-          score: p.score,
-          comments: p.num_comments,
-          rank: p.score + 2 * p.num_comments,
-        });
+  const all = [];
+  for (const feed of FEEDS) {
+    const items = await fetchFeed(feed);
+    all.push(...items);
+  }
+  const fresh = all.filter(i => i.ageDays <= MAX_AGE_DAYS);
+  fresh.sort((a, b) => a.ageDays - b.ageDays);
+  const bySource = {};
+  for (const i of fresh) (bySource[i.source] ||= []).push(i);
+  const interleaved = [];
+  let added = true;
+  while (added) {
+    added = false;
+    for (const src of Object.keys(bySource)) {
+      if (bySource[src].length) {
+        interleaved.push(bySource[src].shift());
+        added = true;
       }
-    } catch (e) {
-      console.warn("reddit fetch failed for", sub, e.message);
     }
   }
-  candidates.sort((a, b) => b.rank - a.rank);
-  return candidates;
+  return interleaved.slice(0, 12);
 }
 
 function extractKeyTerms(redditTitle) {
@@ -110,45 +163,50 @@ async function pubmedAbstract(pmid) {
 }
 
 async function findValidatedStudy(candidates) {
-  // Walk down the candidate list, try to validate each on PubMed.
-  for (const c of candidates.slice(0, 8)) {
-    const query = extractKeyTerms(c.title);
-    if (!query) continue;
-    try {
-      const ids = await pubmedSearch(query);
-      for (const pmid of ids) {
-        const summary = await pubmedSummary(pmid);
-        if (!summary || !summary.title) continue;
-        // Sanity-check title overlap (avoid wrong-paper matches).
-        const titleWords = new Set(summary.title.toLowerCase().split(/\W+/).filter(w => w.length > 3));
-        const queryWords = query.toLowerCase().split(/\W+/).filter(w => w.length > 3);
-        const overlap = queryWords.filter(w => titleWords.has(w)).length;
-        if (overlap < 2) continue;
-        const abstract = await pubmedAbstract(pmid);
-        return {
-          ...summary,
-          abstract,
-          redditPost: c,
-          validated: true,
-          validationNote: `Verified via PubMed (PMID ${pmid})`,
-        };
+  for (const c of candidates.slice(0, 10)) {
+    // Build query from title plus any noun-ish tokens from description.
+    const titleQuery = extractKeyTerms(c.title);
+    const descQuery = extractKeyTerms(c.description || "").split(" ").slice(0, 4).join(" ");
+    const queries = [titleQuery, `${titleQuery} ${descQuery}`.trim()].filter(Boolean);
+    let matched = false;
+    for (const query of queries) {
+      try {
+        const ids = await pubmedSearch(query);
+        for (const pmid of ids) {
+          const summary = await pubmedSummary(pmid);
+          if (!summary || !summary.title) continue;
+          const titleWords = new Set(summary.title.toLowerCase().split(/\W+/).filter(w => w.length > 3));
+          const queryWords = query.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+          const overlap = queryWords.filter(w => titleWords.has(w)).length;
+          if (overlap < 2) continue;
+          const abstract = await pubmedAbstract(pmid);
+          return {
+            ...summary,
+            abstract,
+            sourcePost: c,
+            validated: true,
+            validationNote: `Verified via PubMed (PMID ${pmid})`,
+          };
+        }
+      } catch (e) {
+        console.warn("pubmed lookup failed for", c.title.slice(0, 60), e.message);
       }
-    } catch (e) {
-      console.warn("pubmed lookup failed for", c.title.slice(0, 60), e.message);
+      if (matched) break;
     }
   }
-  // Fallback: return first candidate without validation.
+  // Fallback: most recent blog summary, unverified but still a real journalist-curated article.
   if (candidates[0]) {
+    const c = candidates[0];
     return {
-      title: candidates[0].title,
+      title: c.title,
       authors: "",
-      journal: candidates[0].subreddit,
-      studyUrl: candidates[0].externalUrl || candidates[0].permalink,
+      journal: c.source,
+      studyUrl: c.link,
       doi: null,
-      abstract: candidates[0].selftext,
-      redditPost: candidates[0],
+      abstract: c.description,
+      sourcePost: c,
       validated: false,
-      validationNote: "Could not be independently verified on PubMed",
+      validationNote: "Source article from " + c.source + " — primary paper not independently matched on PubMed",
     };
   }
   return null;
@@ -202,10 +260,10 @@ Journal: ${study.journal}
 DOI: ${study.doi || "—"}
 Abstract:
 ${(study.abstract || "").slice(0, 4000)}`
-    : `UNVERIFIED reddit-sourced post (PubMed match not found):
+    : `UNVERIFIED — science-journalism summary from ${study.journal} (the primary paper could not be cleanly matched on PubMed):
 Title: ${study.title}
-Source: ${study.journal}
-Body text (may be a discussion thread, not a study):
+Article URL: ${study.studyUrl}
+Article summary text:
 ${(study.abstract || "").slice(0, 2000)}`;
 
   const prompt = `Today is ${today}. Generate fresh daily content for a psychology/neuropsychology dashboard targeted at PsyD students. Return ALL THREE pieces.
@@ -221,7 +279,7 @@ ${(study.abstract || "").slice(0, 2000)}`;
    - weaknesses: 3-5 short bullets (each one sentence). Limitations: small N, selection bias, generalizability, confounds, replication concerns, etc.
    ${study.validated
      ? "Ground all analysis in the abstract provided. Do not invent details not in the abstract."
-     : "The source could NOT be verified on PubMed. Be honest about this — note in psydAnalysis that this is a discussion-level post or unverified claim, and base strengths/weaknesses on what's discernible from the post text only. Do NOT invent study methods or findings."}
+     : "The primary paper could NOT be matched on PubMed, but the source IS a legitimate science-journalism summary. Note in psydAnalysis that you're working from the journalist's summary rather than the original abstract. Base strengths/weaknesses on what's described in the article. Do NOT invent specific N values, p-values, or methods that the article doesn't mention."}
 
 ${studyContext}
 
@@ -244,12 +302,12 @@ Ethics: no diagnostic claims, no medication advice, no clinical promises. Return
 async function main() {
   console.log("[daily-brain]", today, "— generating content");
 
-  console.log("→ fetching trending psych studies from Reddit");
+  console.log("→ fetching trending psych studies from RSS feeds");
   const candidates = await fetchTrendingCandidates();
   if (candidates.length === 0) {
     throw new Error("No trending study candidates found");
   }
-  console.log("  ", candidates.length, "candidates");
+  console.log("  ", candidates.length, "candidates from", FEEDS.map(f => f.name).join(", "));
 
   console.log("→ validating top candidates against PubMed");
   const study = await findValidatedStudy(candidates);
@@ -270,7 +328,8 @@ async function main() {
       authors: study.authors || "",
       journal: study.journal || "",
       studyUrl: study.studyUrl,
-      redditUrl: study.redditPost?.permalink || null,
+      sourceUrl: study.sourcePost?.link || null,
+      sourceName: study.sourcePost?.source || null,
       eli5: generated.studyAnalysis.eli5,
       psydAnalysis: generated.studyAnalysis.psydAnalysis,
       strengths: generated.studyAnalysis.strengths,

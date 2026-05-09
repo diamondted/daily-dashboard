@@ -1,50 +1,50 @@
 {
   "date": "2026-05-09",
-  "generatedAt": "2026-05-09T17:18:32.374Z",
+  "generatedAt": "2026-05-09T17:25:58.064Z",
   "quote": {
-    "text": "The mind is not a vessel to be filled, but a fire to be kindled.",
-    "author": "Plutarch"
+    "text": "The brain is wider than the sky, for, put them side by side, the one the other will contain with ease, and you beside.",
+    "author": "Emily Dickinson"
   },
   "eppp": {
-    "question": "A psychologist is conducting a neuropsychological evaluation and wants to assess a client's ability to inhibit a prepotent response. Which test is MOST appropriate for this purpose?",
+    "question": "A psychologist receives a subpoena from an attorney requesting the complete clinical record of a current client. The client has not authorized release. What is the psychologist's MOST appropriate first action?",
     "options": [
-      "Wisconsin Card Sorting Test (WCST)",
-      "Stroop Color and Word Test",
-      "Rey-Osterrieth Complex Figure Test",
-      "Boston Naming Test"
+      "Comply with the subpoena immediately, since it is a legal document",
+      "Ignore the subpoena because the client has not consented",
+      "Contact the client and consult with an attorney to clarify obligations and options",
+      "Release only the intake summary to demonstrate good-faith cooperation"
     ],
-    "correctIndex": 1,
-    "eli5": "The Stroop test shows you the word 'RED' printed in blue ink and asks you to say the ink color, not the word. Your brain really wants to read the word — that's the strong, automatic urge. Saying 'blue' instead means you have to stop that urge. That stopping power is called response inhibition.",
+    "correctIndex": 2,
+    "eli5": "A subpoena is like a letter asking for the toy box, but it is not the same as a judge saying you MUST hand it over. Before sharing private things, the psychologist talks to the client and asks a lawyer what to do. That keeps the client's secrets safe and follows the rules.",
     "whyOthersWrong": [
-      "The WCST mostly measures cognitive flexibility and set-shifting — switching rules — not stopping a strong automatic urge.",
+      "A subpoena alone is not a court order, so handing everything over right away can break confidentiality.",
+      "Ignoring it is risky and can get the psychologist in legal trouble; you must respond, just carefully.",
       "(correct)",
-      "The Rey figure measures visuospatial skills and visual memory, like copying and remembering a complicated drawing.",
-      "The Boston Naming Test checks if you can name pictures of objects — it measures word-finding, not stopping urges."
+      "Sharing even part of the record without permission or legal guidance still leaks private information."
     ]
   },
   "study": {
-    "title": "New study sheds light on how going braless alters public perceptions of a woman",
+    "title": "Beyond the Gym: Why Your Brain Craves Creatine",
     "authors": "",
-    "journal": "r/psychology",
-    "studyUrl": "https://www.psypost.org/new-study-sheds-light-on-how-going-braless-alters-public-perceptions-of-a-woman/",
-    "redditUrl": "https://reddit.com/r/psychology/comments/1t6ovph/new_study_sheds_light_on_how_going_braless_alters/",
-    "eli5": "A reddit post describes a study about how people see women who do or don't wear a bra. The post says going braless was rated as more attractive but also made people think the woman was more sexually available. Women in the study reportedly worried more about harassment because of this. So clothing choice becomes a balancing act between looking nice and feeling safe.",
-    "psydAnalysis": "Important caveat: this summary comes from a reddit discussion post and could not be verified on PubMed, so the actual methods, sample, and findings are unclear. For PsyD students, the broader topic still matters — clinicians often work with clients who experience anxiety, harassment, body image concerns, or trauma tied to how their bodies are perceived in public. The reported idea of a 'trade-off' between attractiveness and safety fits well with research on objectification theory and minority stress, which can shape mood, self-esteem, and PTSD-related symptoms. In therapy, a clinician might gently explore how a client's daily choices (clothing, routes, social settings) are shaped by fear of judgment or harm, without pathologizing reasonable safety behaviors. Until the original paper is read directly, treat the specific numbers and conclusions as unverified.",
+    "journal": "Neuroscience News",
+    "studyUrl": "https://neurosciencenews.com/creatine-atp-brain-health-30659/",
+    "sourceUrl": "https://neurosciencenews.com/creatine-atp-brain-health-30659/",
+    "sourceName": "Neuroscience News",
+    "eli5": "Scientists looked at creatine, the stuff people take to get stronger at the gym. They wanted to see what it does inside the brain. They found it helps brain cells make energy faster, like recharging tiny batteries. This might help people think more clearly, especially as they get older.",
+    "psydAnalysis": "This summary (working from the Neuroscience News write-up rather than the original paper's abstract, which I could not cleanly match) frames creatine as a brain-energy helper, not just a muscle supplement. The proposed mechanism is faster regeneration of ATP, the molecule cells use as fuel, which matters because the brain is one of the body's hungriest organs. For clinical psychology, this is relevant to neurocognitive aging, fatigue-related cognitive complaints, and lifestyle factors clients often ask about. A future clinician will not prescribe supplements, but understanding the literature helps with informed conversations and appropriate referrals to physicians or neurologists. It also reinforces the biopsychosocial frame: cognition rests on metabolic substrates, and energy supply may interact with mood, attention, and processing speed. Treat this as an interesting hypothesis-generating signal, not a settled clinical recommendation.",
     "strengths": [
-      "Topic has clear real-world relevance to women's daily experiences and safety.",
-      "Connects to established frameworks like objectification theory.",
-      "Includes both male and female perceiver perspectives, per the post.",
-      "Highlights a practical trade-off clients may actually face.",
-      "Generates testable hypotheses for future, better-documented research."
+      "Targets a clear, testable mechanism (ATP regeneration) rather than a vague wellness claim.",
+      "Highlights relevance to aging brains, a high-need clinical population.",
+      "Connects a widely available, well-studied compound to cognitive outcomes, easing translation.",
+      "Encourages integration of metabolic and neurological thinking into mental health care."
     ],
     "weaknesses": [
-      "Source is a reddit summary, not a verified peer-reviewed article — claims cannot be confirmed.",
-      "No information given on sample size, demographics, or country of participants.",
-      "Methodology (photos? videos? vignettes?) is not described, so ecological validity is unknown.",
-      "Findings about 'fear of harassment' may rely on self-report, which can be biased.",
-      "Cultural and age-related factors in perception of clothing are not addressed in the post."
+      "The journalist summary does not report sample size, design, or effect sizes, so rigor is unclear.",
+      "No information on whether findings come from animal models, humans, or both.",
+      "Dosage, duration, and safety details are not specified in the summary.",
+      "Generalizability across age, sex, diet, and clinical populations is unaddressed.",
+      "Publication and replication status of the underlying paper cannot be verified from this source alone."
     ],
     "validated": false,
-    "validationNote": "Could not be independently verified on PubMed"
+    "validationNote": "Source article from Neuroscience News — primary paper not independently matched on PubMed"
   }
 }

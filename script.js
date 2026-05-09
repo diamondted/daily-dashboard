@@ -69,12 +69,13 @@ function render(d) {
 
   const link = document.getElementById('study-link');
   link.href = s.studyUrl;
-  const reddit = document.getElementById('study-reddit');
-  if (s.redditUrl) {
-    reddit.href = s.redditUrl;
-    reddit.style.display = '';
+  const source = document.getElementById('study-source');
+  if (s.sourceUrl && s.sourceUrl !== s.studyUrl) {
+    source.href = s.sourceUrl;
+    source.textContent = s.sourceName ? `${s.sourceName} article` : 'Source article';
+    source.style.display = '';
   } else {
-    reddit.style.display = 'none';
+    source.style.display = 'none';
   }
 
   document.getElementById('study-eli5').textContent = s.eli5;
