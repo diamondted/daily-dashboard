@@ -1,47 +1,48 @@
 {
-  "date": "2026-05-07",
-  "generatedAt": "2026-05-07T15:55:00.204Z",
+  "date": "2026-05-09",
+  "generatedAt": "2026-05-09T17:18:32.374Z",
   "quote": {
     "text": "The mind is not a vessel to be filled, but a fire to be kindled.",
     "author": "Plutarch"
   },
   "eppp": {
-    "question": "A 7-year-old child is referred for evaluation due to persistent inattention and hyperactivity at school and home. The psychologist wants to use a measure that gathers information from multiple raters across settings to assess these behaviors. Which instrument is MOST appropriate?",
+    "question": "A psychologist is conducting a neuropsychological evaluation and wants to assess a client's ability to inhibit a prepotent response. Which test is MOST appropriate for this purpose?",
     "options": [
-      "Wechsler Intelligence Scale for Children, Fifth Edition (WISC-V)",
-      "Behavior Assessment System for Children, Third Edition (BASC-3)",
-      "Children's Apperception Test (CAT)",
-      "Bender Visual-Motor Gestalt Test, Second Edition"
+      "Wisconsin Card Sorting Test (WCST)",
+      "Stroop Color and Word Test",
+      "Rey-Osterrieth Complex Figure Test",
+      "Boston Naming Test"
     ],
     "correctIndex": 1,
-    "eli5": "The BASC-3 is like asking lots of grown-ups who know the kid — parents AND teachers — to fill out the same kind of checklist. That way you see if the child acts the same way at home and at school. It's built to spot things like trouble paying attention or being too wiggly.",
+    "eli5": "The Stroop test shows you the word 'RED' printed in blue ink and asks you to say the ink color, not the word. Your brain really wants to read the word — that's the strong, automatic urge. Saying 'blue' instead means you have to stop that urge. That stopping power is called response inhibition.",
     "whyOthersWrong": [
-      "The WISC-V measures how smart a kid is at thinking and solving puzzles, not how they behave across home and school.",
+      "The WCST mostly measures cognitive flexibility and set-shifting — switching rules — not stopping a strong automatic urge.",
       "(correct)",
-      "The CAT shows kids pictures and asks them to tell stories — it's about feelings and inner worries, not a checklist for many adults to fill out.",
-      "The Bender checks how well a kid can copy shapes with a pencil — it looks at hand-eye skills, not behavior across settings."
+      "The Rey figure measures visuospatial skills and visual memory, like copying and remembering a complicated drawing.",
+      "The Boston Naming Test checks if you can name pictures of objects — it measures word-finding, not stopping urges."
     ]
   },
   "study": {
-    "title": "For years, researchers have claimed that men’s friendships are shallower and less emotionally supportive than women’s, a pattern called the “gender friendship gap.” But new research finds that the gap is largely driven by white men specifically, not men as a whole.",
+    "title": "New study sheds light on how going braless alters public perceptions of a woman",
     "authors": "",
     "journal": "r/psychology",
-    "studyUrl": "https://www.psypost.org/the-gender-friendship-gap-is-driven-primarily-by-white-men-not-a-universal-difference-across-groups/",
-    "redditUrl": "https://reddit.com/r/psychology/comments/1t1o08s/for_years_researchers_have_claimed_that_mens/",
-    "eli5": "Some people online shared a claim that men's friendships look less close and supportive than women's. The post says new research suggests this 'gap' mostly shows up for white men, not men in general. In other words, men from other racial groups may have closer friendships than the old story suggested. We could not find the actual study to check the details.",
-    "psydAnalysis": "Heads up: this came from a Reddit discussion thread and we could not verify it on PubMed, so treat it as an unverified claim, not established science. If the claim holds, it would matter for clinical work because therapists often assume male clients have weaker social support and may push them toward building friendships using a one-size-fits-all model. The claim suggests culture and race shape how men connect, so a clinician should ask each client how their community defines closeness instead of guessing. It also reminds us that older research on gender often used mostly white college samples, which can make findings look universal when they are not. For a future PsyD, the takeaway is to stay curious about who was actually studied before applying a 'known' pattern to a client in front of you.",
+    "studyUrl": "https://www.psypost.org/new-study-sheds-light-on-how-going-braless-alters-public-perceptions-of-a-woman/",
+    "redditUrl": "https://reddit.com/r/psychology/comments/1t6ovph/new_study_sheds_light_on_how_going_braless_alters/",
+    "eli5": "A reddit post describes a study about how people see women who do or don't wear a bra. The post says going braless was rated as more attractive but also made people think the woman was more sexually available. Women in the study reportedly worried more about harassment because of this. So clothing choice becomes a balancing act between looking nice and feeling safe.",
+    "psydAnalysis": "Important caveat: this summary comes from a reddit discussion post and could not be verified on PubMed, so the actual methods, sample, and findings are unclear. For PsyD students, the broader topic still matters — clinicians often work with clients who experience anxiety, harassment, body image concerns, or trauma tied to how their bodies are perceived in public. The reported idea of a 'trade-off' between attractiveness and safety fits well with research on objectification theory and minority stress, which can shape mood, self-esteem, and PTSD-related symptoms. In therapy, a clinician might gently explore how a client's daily choices (clothing, routes, social settings) are shaped by fear of judgment or harm, without pathologizing reasonable safety behaviors. Until the original paper is read directly, treat the specific numbers and conclusions as unverified.",
     "strengths": [
-      "The topic addresses a clinically meaningful question about social support and male clients.",
-      "Breaking results down by race pushes back against treating 'men' as one uniform group.",
-      "If accurate, the framing aligns with growing calls for intersectional research in psychology.",
-      "The discussion invites clinicians to question long-standing assumptions in the literature."
+      "Topic has clear real-world relevance to women's daily experiences and safety.",
+      "Connects to established frameworks like objectification theory.",
+      "Includes both male and female perceiver perspectives, per the post.",
+      "Highlights a practical trade-off clients may actually face.",
+      "Generates testable hypotheses for future, better-documented research."
     ],
     "weaknesses": [
-      "The original study could not be located on PubMed, so methods, sample size, and measures are unknown.",
-      "We cannot tell how 'friendship depth' or 'emotional support' was defined or measured.",
-      "Reddit summaries often overstate or simplify findings from a single study.",
-      "Without the source, we do not know if results have been replicated or peer-reviewed.",
-      "The claim risks creating a new stereotype if readers generalize from one unverified post."
+      "Source is a reddit summary, not a verified peer-reviewed article — claims cannot be confirmed.",
+      "No information given on sample size, demographics, or country of participants.",
+      "Methodology (photos? videos? vignettes?) is not described, so ecological validity is unknown.",
+      "Findings about 'fear of harassment' may rely on self-report, which can be biased.",
+      "Cultural and age-related factors in perception of clothing are not addressed in the post."
     ],
     "validated": false,
     "validationNote": "Could not be independently verified on PubMed"
