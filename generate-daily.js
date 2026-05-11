@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Daily Brain — content generator.
- * Produces today.json with: quote, EPPP MCQ, validated PubMed study (PsyD-level breakdown).
+ * Produces a payload with: quote, EPPP MCQ, validated PubMed study (PsyD-level breakdown).
  *
- * Run: node daily-dashboard/generate-daily.js
- *   --force     ignore that today.json already exists
+ * As a library: `import { generateToday } from "./generate-daily.js"` → returns payload object.
+ * As a CLI: `node daily-dashboard/generate-daily.js [--force]` → writes today.json.
  */
 
 import "dotenv/config";
@@ -16,16 +16,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, "today.json");
 
-const FORCE = process.argv.includes("--force");
 const today = new Date().toISOString().slice(0, 10);
-
-if (!FORCE && fs.existsSync(OUT)) {
-  const existing = JSON.parse(fs.readFileSync(OUT, "utf8"));
-  if (existing.date === today) {
-    console.log("today.json already up to date for", today, "— skip (use --force to regenerate)");
-    process.exit(0);
-  }
-}
 
 const FEEDS = [
   { name: "PsyPost", url: "https://www.psypost.org/feed/" },
@@ -299,7 +290,7 @@ Ethics: no diagnostic claims, no medication advice, no clinical promises. Return
   return JSON.parse(textBlock.text);
 }
 
-async function main() {
+export async function generateToday() {
   console.log("[daily-brain]", today, "— generating content");
 
   console.log("→ fetching trending psych studies from RSS feeds");
@@ -318,7 +309,7 @@ async function main() {
   console.log("→ asking Claude for quote + EPPP + study analysis");
   const generated = await generateContent(study);
 
-  const payload = {
+  return {
     date: today,
     generatedAt: new Date().toISOString(),
     quote: generated.quote,
@@ -338,12 +329,25 @@ async function main() {
       validationNote: study.validationNote,
     },
   };
-
-  fs.writeFileSync(OUT, JSON.stringify(payload, null, 2));
-  console.log("✓ wrote", OUT);
 }
 
-main().catch((err) => {
-  console.error("FAILED:", err);
-  process.exit(1);
-});
+const isCli = process.argv[1] && process.argv[1] === fileURLToPath(import.meta.url);
+if (isCli) {
+  const force = process.argv.includes("--force");
+  if (!force && fs.existsSync(OUT)) {
+    const existing = JSON.parse(fs.readFileSync(OUT, "utf8"));
+    if (existing.date === today) {
+      console.log("today.json already up to date for", today, "— skip (use --force to regenerate)");
+      process.exit(0);
+    }
+  }
+  generateToday()
+    .then((payload) => {
+      fs.writeFileSync(OUT, JSON.stringify(payload, null, 2));
+      console.log("✓ wrote", OUT);
+    })
+    .catch((err) => {
+      console.error("FAILED:", err);
+      process.exit(1);
+    });
+}

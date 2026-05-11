@@ -1,0 +1,19 @@
+{
+  "name": "daily-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily Brain — daily psychology/neuropsychology email (quote, EPPP MCQ, PubMed-validated study).",
+  "scripts": {
+    "generate": "node generate-daily.js",
+    "send": "node send-daily-email.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "dotenv": "^16.4.5",
+    "resend": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
