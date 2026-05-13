@@ -18,6 +18,52 @@ const OUT = path.join(__dirname, "today.json");
 
 const today = new Date().toISOString().slice(0, 10);
 
+const EPPP_AREAS = [
+  {
+    name: "Biological Bases of Behavior",
+    subtopics: ["neuroanatomy and brain lesions", "neurotransmitter systems", "psychopharmacology", "neurological disorders", "psychophysiology and the HPA axis", "behavioral genetics"],
+  },
+  {
+    name: "Cognitive-Affective Bases of Behavior",
+    subtopics: ["memory systems and amnesia", "attention and executive function", "classical and operant learning", "emotion regulation", "cognitive biases and heuristics", "language and aphasia"],
+  },
+  {
+    name: "Social and Cultural Bases of Behavior",
+    subtopics: ["group dynamics and conformity", "attribution theory", "cross-cultural competence", "prejudice and stigma", "social influence and persuasion", "identity and acculturation"],
+  },
+  {
+    name: "Growth and Lifespan Development",
+    subtopics: ["attachment styles", "Piaget and Vygotsky", "adolescent identity development", "older adult cognition and dementia screening", "developmental psychopathology", "Erikson's psychosocial stages"],
+  },
+  {
+    name: "Assessment and Diagnosis",
+    subtopics: ["test validity and reliability concepts", "WAIS/WISC interpretation", "MMPI-3 and PAI interpretation", "neuropsych battery selection", "differential diagnosis", "DSM-5-TR criteria edge cases"],
+  },
+  {
+    name: "Treatment, Intervention, Prevention, and Supervision",
+    subtopics: ["CBT techniques and protocols", "evidence-based treatments for specific disorders", "termination and ruptures", "group and family therapy", "supervision models", "telehealth and digital practice"],
+  },
+  {
+    name: "Research Methods and Statistics",
+    subtopics: ["effect sizes and clinical significance", "ANOVA vs regression interpretation", "internal vs external validity", "Type I/II errors and power", "single-subject and N-of-1 designs", "meta-analysis interpretation"],
+  },
+  {
+    name: "Ethical, Legal, and Professional Issues",
+    subtopics: ["APA Ethics Code edge cases", "mandated reporting decisions", "informed consent complications", "multiple relationships and boundary crossings", "scope of competence", "record-keeping and HIPAA"],
+  },
+];
+
+function pickEpppFocus(dateStr) {
+  // Deterministic rotation: day-of-year picks the area, a different stride picks the subtopic.
+  // Cycles through 8 areas × 6 subtopics = 48 unique combinations before repeating.
+  const d = new Date(dateStr + "T00:00:00Z");
+  const startOfYear = Date.UTC(d.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor((d.getTime() - startOfYear) / 86400000);
+  const area = EPPP_AREAS[dayOfYear % EPPP_AREAS.length];
+  const subIdx = Math.floor(dayOfYear / EPPP_AREAS.length) % area.subtopics.length;
+  return { area: area.name, subtopic: area.subtopics[subIdx], dayOfYear };
+}
+
 const FEEDS = [
   { name: "PsyPost", url: "https://www.psypost.org/feed/" },
   { name: "Neuroscience News", url: "https://neurosciencenews.com/feed/" },
@@ -242,7 +288,7 @@ const SCHEMA = {
   required: ["quote", "eppp", "studyAnalysis"],
 };
 
-async function generateContent(study) {
+async function generateContent(study, epppFocus) {
   const studyContext = study.validated
     ? `VERIFIED study from PubMed:
 Title: ${study.title}
@@ -261,7 +307,10 @@ ${(study.abstract || "").slice(0, 2000)}`;
 
 1) QUOTE: One real quote from a real psychologist, neuroscientist, philosopher, or scientist. VARY DAILY — do NOT default to William James, Carl Jung, or Viktor Frankl. Just text + author. NO explanation needed.
 
-2) EPPP MULTIPLE-CHOICE: One question for the Examination for Professional Practice in Psychology. Cover any major content area (assessment, ethics, treatment, psychopathology, biological bases, lifespan, social/cultural, research methods, professional issues). 4 options. correctIndex 0-3. eli5 explanation of WHY the correct answer is correct (simple words, concrete imagery a 5yo could picture). whyOthersWrong: array of 4 strings — the entry at correctIndex must be exactly "(correct)", the other three give ELI5-style explanations of why each is wrong.
+2) EPPP MULTIPLE-CHOICE: One question for the Examination for Professional Practice in Psychology.
+   **TODAY'S REQUIRED CONTENT AREA: ${epppFocus.area}**
+   **TODAY'S REQUIRED SUB-FOCUS: ${epppFocus.subtopic}**
+   The question MUST be specifically about this area and sub-focus. Do NOT drift into a different content area (e.g. if the area is "Biological Bases" do not write an ethics question). 4 options. correctIndex 0-3. eli5 explanation of WHY the correct answer is correct (simple words, concrete imagery a 5yo could picture). whyOthersWrong: array of 4 strings — the entry at correctIndex must be exactly "(correct)", the other three give ELI5-style explanations of why each is wrong.
 
 3) STUDY ANALYSIS for a PsyD student. Use simple, ELI5-level language throughout — short sentences, concrete imagery, no jargon dump — but with depth a clinical doctoral student needs. Provide:
    - eli5: 3-4 plain sentences. What did they do, what did they find. No clinical advice.
@@ -306,8 +355,11 @@ export async function generateToday() {
   console.log("  picked:", study.title.slice(0, 80));
   console.log("  validated:", study.validated, "—", study.validationNote);
 
+  const epppFocus = pickEpppFocus(today);
+  console.log("→ today's EPPP focus:", epppFocus.area, "—", epppFocus.subtopic, `(day ${epppFocus.dayOfYear})`);
+
   console.log("→ asking Claude for quote + EPPP + study analysis");
-  const generated = await generateContent(study);
+  const generated = await generateContent(study, epppFocus);
 
   return {
     date: today,
